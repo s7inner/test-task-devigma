@@ -9,12 +9,8 @@ import Header from '@/Components/Navigation/Header.vue';
         <Header />
 
         <!-- Main Content -->
-        <main class="flex min-h-[calc(100vh-120px)] items-center justify-center px-4 sm:px-6 lg:px-8">
-            <div class="w-full max-w-md">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-                    <slot />
-                </div>
-            </div>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <slot />
         </main>
 
         <!-- Footer -->
