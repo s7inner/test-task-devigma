@@ -1,5 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import Footer from '@/Components/Navigation/Footer.vue';
+import Header from '@/Components/Navigation/Header.vue';
 import axios from 'axios';
 
 defineProps({
@@ -34,52 +36,18 @@ testAxios();
 </script>
 
 <template>
-    <Head title="Welcome - Tech Stack Demo" />
+    <Head title="Welcome - Test Task Devigma" />
 
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
         <!-- Header -->
-        <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-6">
-                    <div class="flex items-center">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                            🚀 Tech Stack Demo
-                        </h1>
-                    </div>
-                    <nav v-if="canLogin" class="flex space-x-4">
-                        <Link
-                            v-if="$page.props.auth.user"
-                            :href="route('dashboard')"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                        >
-                            Dashboard
-                        </Link>
-                        <template v-else>
-                            <Link
-                                :href="route('login')"
-                                class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                v-if="canRegister"
-                                :href="route('register')"
-                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                            >
-                                Register
-                            </Link>
-                        </template>
-                    </nav>
-                </div>
-            </div>
-        </header>
+        <Header />
 
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <!-- Hero Section -->
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                    Welcome to Our Tech Stack Demo
+                    Welcome to Test Task Devigma
                 </h2>
                 <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
                     This page demonstrates the integration of modern web technologies in a single repository setup.
@@ -216,12 +184,6 @@ testAxios();
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div class="text-center text-gray-600 dark:text-gray-400">
-                    <p>&copy; 2024 Tech Stack Demo. Built with Laravel Breeze + Vue 3 + Tailwind CSS + Axios.</p>
-                </div>
-            </div>
-        </footer>
+        <Footer />
     </div>
 </template>
