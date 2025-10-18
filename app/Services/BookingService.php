@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\Bookings\CancelBookingDTO;
 use App\DTO\Bookings\CreateBookingDTO;
 use App\DTO\Bookings\GetUserBookingsDTO;
 use App\Models\Booking;
@@ -34,5 +35,21 @@ class BookingService
                 'time_slot' => $dto->time_slot,
                 'status' => Booking::STATUS_BOOKED,
             ]);
+    }
+
+    /**
+     * Cancel a booking for a user.
+     */
+    public function cancelBooking(CancelBookingDTO $dto): Booking
+    {
+        $booking = Booking::where('id', $dto->booking_id)
+            ->where('user_id', $dto->user_id)
+            ->firstOrFail();
+
+        $booking->update([
+            'status' => Booking::STATUS_CANCELLED,
+        ]);
+
+        return $booking->fresh();
     }
 }

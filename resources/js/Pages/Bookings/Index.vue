@@ -4,13 +4,16 @@ import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { useBookings } from './Composables/useBookings';
 import { useCreateBooking } from './Composables/useCreateBooking';
+import { useCancelBooking } from './Composables/useCancelBooking';
 import BookingsTable from './Components/BookingsTable.vue';
 import CreateBookingModal from './Components/CreateBookingModal.vue';
 
 const { bookings, loading, error, fetchBookings } = useBookings();
 const { loading: creating, error: createError, createBooking } = useCreateBooking();
+const { loading: cancelling, error: cancelError, cancelBooking } = useCancelBooking();
 
 const showCreateForm = ref(false);
+const cancellingBookingId = ref(null);
 
 const handleCreateBooking = async (formData) => {
     try {
@@ -19,6 +22,18 @@ const handleCreateBooking = async (formData) => {
         showCreateForm.value = false;
     } catch (err) {
         // Error is handled by the composable
+    }
+};
+
+const handleCancelBooking = async (bookingId) => {
+    try {
+        cancellingBookingId.value = bookingId;
+        await cancelBooking(bookingId);
+        await fetchBookings(); // Refresh the list
+    } catch (err) {
+        // Error is handled by the composable
+    } finally {
+        cancellingBookingId.value = null;
     }
 };
 </script>
@@ -60,7 +75,9 @@ const handleCreateBooking = async (formData) => {
             :bookings="bookings"
             :loading="loading"
             :error="error"
+            :cancelling-booking-id="cancellingBookingId"
             @retry="fetchBookings"
+            @cancel-booking="handleCancelBooking"
         />
 
         <!-- Create Booking Modal -->
