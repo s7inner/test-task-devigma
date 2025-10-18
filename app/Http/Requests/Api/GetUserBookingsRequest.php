@@ -4,23 +4,10 @@ namespace App\Http\Requests\Api;
 
 use App\Contracts\DataRequestInterface;
 use App\DTO\Bookings\GetUserBookingsDTO;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetUserBookingsRequest extends FormRequest implements DataRequestInterface
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array|string>
-     */
-    public function rules(): array
-    {
-        return [
-            // No validation needed for GET request
-        ];
-    }
-
     /**
      * Get the DTO from the request.
      */
