@@ -1,26 +1,25 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { useBookings } from '@/composables/useBookings';
+import { ref } from 'vue';
+import { useBookings } from './Composables/useBookings';
+import { useCreateBooking } from './Composables/useCreateBooking';
+import BookingsTable from './Components/BookingsTable.vue';
+import CreateBookingModal from './Components/CreateBookingModal.vue';
 
 const { bookings, loading, error, fetchBookings } = useBookings();
+const { loading: creating, error: createError, createBooking } = useCreateBooking();
 
-const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-};
+const showCreateForm = ref(false);
 
-const getStatusBadge = (status) => {
-    return status === 'booked' 
-        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-};
-
-const getStatusText = (status) => {
-    return status === 'booked' ? 'Booked' : 'Cancelled';
+const handleCreateBooking = async (formData) => {
+    try {
+        await createBooking(formData);
+        await fetchBookings(); // Refresh the list
+        showCreateForm.value = false;
+    } catch (err) {
+        // Error is handled by the composable
+    }
 };
 </script>
 
@@ -43,81 +42,35 @@ const getStatusText = (status) => {
             </p>
         </div>
 
-        <!-- Bookings Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            <!-- Loading State -->
-            <div v-if="loading" class="p-8 text-center">
-                <div class="inline-flex items-center">
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Loading bookings...
-                </div>
-            </div>
-
-            <!-- Error State -->
-            <div v-else-if="error" class="p-8 text-center">
-                <div class="text-red-600 dark:text-red-400 mb-4">
-                    <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    {{ error }}
-                </div>
-                <button @click="fetchBookings" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-medium">
-                    Try again
-                </button>
-            </div>
-
-            <!-- Empty State -->
-            <div v-else-if="bookings.length === 0" class="p-8 text-center">
-                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        <!-- Create Booking Button -->
+        <div class="mb-6 flex justify-end">
+            <button 
+                @click="showCreateForm = true"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No bookings yet</h3>
-                <p class="text-gray-600 dark:text-gray-300">You haven't made any bookings yet.</p>
-            </div>
-
-            <!-- Bookings Table -->
-            <div v-else class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Date
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Time
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                Created
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        <tr v-for="booking in bookings" :key="booking.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                {{ formatDate(booking.date) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                {{ booking.time_slot }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span :class="getStatusBadge(booking.status)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                                    {{ getStatusText(booking.status) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                {{ new Date(booking.created_at).toLocaleDateString('en-US') }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                Create New Booking
+            </button>
         </div>
+
+        <!-- Bookings Table -->
+        <BookingsTable 
+            :bookings="bookings"
+            :loading="loading"
+            :error="error"
+            @retry="fetchBookings"
+        />
+
+        <!-- Create Booking Modal -->
+        <CreateBookingModal
+            :show="showCreateForm"
+            :loading="creating"
+            :error="createError"
+            @close="showCreateForm = false"
+            @submit="handleCreateBooking"
+        />
 
         <!-- Quick Actions -->
         <div class="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">

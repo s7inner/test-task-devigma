@@ -1,5 +1,6 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { route } from 'ziggy-js';
 
 export function useBookings() {
     const bookings = ref([]);
@@ -11,7 +12,7 @@ export function useBookings() {
         error.value = null;
         
         try {
-            const response = await axios.get('/api/bookings');
+            const response = await axios.get(route('bookings.index'));
             bookings.value = response.data.data;
         } catch (err) {
             error.value = err.response?.data?.message || 'Failed to fetch bookings';

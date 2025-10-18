@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CreateBookingController;
 use App\Http\Controllers\Api\GetUserBookingsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -12,4 +13,5 @@ Route::prefix('bookings')
     ->middleware('auth:sanctum')
     ->group(function () {
         Route::get('/', GetUserBookingsController::class)->name('bookings.index');
+        Route::post('/', CreateBookingController::class)->name('bookings.store');
     });
