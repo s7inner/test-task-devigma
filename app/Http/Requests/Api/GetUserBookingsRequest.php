@@ -35,7 +35,7 @@ class GetUserBookingsRequest extends FormRequest implements DataRequestInterface
     public function getDto(): GetUserBookingsDTO
     {
         return GetUserBookingsDTO::from([
-            'user_id' => $this->user()->id
+            'user_id' => $this->user()->id,
         ]);
     }
 }

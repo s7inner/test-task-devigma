@@ -14,6 +14,7 @@ class Booking extends Model
      * Booking status constants.
      */
     public const STATUS_BOOKED = 'booked';
+
     public const STATUS_CANCELLED = 'cancelled';
 
     /**

@@ -2,8 +2,8 @@
 
 namespace App\DTO\Bookings;
 
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Data;
 
 class GetUserBookingsDTO extends Data
 {

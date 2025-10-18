@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\BookingResource;
 use App\Http\Requests\Api\GetUserBookingsRequest;
+use App\Http\Resources\BookingResource;
 use App\Services\BookingService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
