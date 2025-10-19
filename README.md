@@ -57,3 +57,22 @@ To completely stop and remove all containers and volumes:
 ```bash
 ./vendor/bin/sail down -v
 ```
+
+## Time spent
+More than 3 hours
+
+## Notes
+
+1. **Route → Single Action Controller → Form Request → DTO → Service → Model → Resource architecture** (SRP) - This is over-engineering for a simple project with some code duplication in its implementation, but this architecture could be beneficial if the project will be scaled up
+
+2. **Hardcoded time slots in both frontend and backend validation** - Add time slots as a database table for future modification from admin panel, and refactor backend and frontend by removing hardcoded time slots
+
+## Improvements
+
+1. **Add API documentation** - Implement Swagger/OpenAPI documentation for all endpoints
+
+2. **Add pagination** - Implement pagination for booking lists to handle large datasets
+
+3. **Add search and filtering** - Allow users to search and filter their bookings
+
+4. **Enhanced booking status management** - Instead of just changing status to "cancelled", come up with some more interesting logic - add a delete button that performs soft delete, add `cancelled_at` and `deleted_at` timestamps
