@@ -15,7 +15,12 @@ class CreateBookingRequest extends FormRequest implements DataRequestInterface
     {
         return [
             'date' => 'required|date|after:today',
-            'time_slot' => 'required|string|in:09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00',
+            'time_slot' => [
+                'required',
+                'string',
+                'in:09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00',
+                'unique:bookings,time_slot,NULL,id,date,'.$this->input('date').',status,booked',
+            ],
         ];
     }
 

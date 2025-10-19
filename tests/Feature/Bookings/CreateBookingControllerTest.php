@@ -110,6 +110,82 @@ class CreateBookingControllerTest extends TestCase
     }
 
     /**
+     * Test that users cannot create duplicate bookings for the same date and time.
+     */
+    public function test_cannot_create_duplicate_booking_same_date_time(): void
+    {
+        $date = now()->addDay()->format('Y-m-d');
+        $timeSlot = '10:00';
+
+        $firstBooking = [
+            'date' => $date,
+            'time_slot' => $timeSlot,
+        ];
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson(route('bookings.store'), $firstBooking);
+
+        $response->assertStatus(Response::HTTP_CREATED);
+
+        // Try to create duplicate booking
+        $duplicateBooking = [
+            'date' => $date,
+            'time_slot' => $timeSlot,
+        ];
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson(route('bookings.store'), $duplicateBooking);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['time_slot']);
+    }
+
+    /**
+     * Test that users can create multiple bookings for the same date but different times.
+     */
+    public function test_can_create_multiple_bookings_same_date_different_times(): void
+    {
+        $date = now()->addDay()->format('Y-m-d');
+
+        // Create first booking
+        $firstBooking = [
+            'date' => $date,
+            'time_slot' => '10:00',
+        ];
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson(route('bookings.store'), $firstBooking);
+
+        $response->assertStatus(Response::HTTP_CREATED);
+
+        // Create second booking for different time
+        $secondBooking = [
+            'date' => $date,
+            'time_slot' => '14:00',
+        ];
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson(route('bookings.store'), $secondBooking);
+
+        $response->assertStatus(Response::HTTP_CREATED);
+
+        // Verify both bookings exist
+        $this->assertDatabaseHas('bookings', [
+            'user_id' => $this->user->id,
+            'date' => $date,
+            'time_slot' => '10:00',
+            'status' => Booking::STATUS_BOOKED,
+        ]);
+
+        $this->assertDatabaseHas('bookings', [
+            'user_id' => $this->user->id,
+            'date' => $date,
+            'time_slot' => '14:00',
+            'status' => Booking::STATUS_BOOKED,
+        ]);
+    }
+
+    /**
      * Data provider for valid booking scenarios.
      */
     public static function validBookingDataProvider(): array
