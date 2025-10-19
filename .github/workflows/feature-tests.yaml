@@ -50,6 +50,16 @@ jobs:
       - name: Build frontend assets
         run: npm run build
 
+      - name: Run database migrations
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: devigma_test
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan migrate --env=testing
+
       - name: Run feature tests
         env:
           DB_CONNECTION: mysql
