@@ -8,7 +8,7 @@ import { useCancelBooking } from './Composables/useCancelBooking';
 import BookingsTable from './Components/BookingsTable.vue';
 import CreateBookingModal from './Components/CreateBookingModal.vue';
 
-const { bookings, loading, error, fetchBookings } = useBookings();
+const { bookings, loading, error, fetchBookings, addBooking, updateBookingStatus } = useBookings();
 const { loading: creating, error: createError, createBooking } = useCreateBooking();
 const { loading: cancelling, error: cancelError, cancelBooking } = useCancelBooking();
 
@@ -17,8 +17,9 @@ const cancellingBookingId = ref(null);
 
 const handleCreateBooking = async (formData) => {
     try {
-        await createBooking(formData);
-        await fetchBookings(); // Refresh the list
+        const newBooking = await createBooking(formData);
+        // Add new booking to local state instead of refreshing
+        addBooking(newBooking.data);
         showCreateForm.value = false;
     } catch (err) {
         // Error is handled by the composable
@@ -29,7 +30,8 @@ const handleCancelBooking = async (bookingId) => {
     try {
         cancellingBookingId.value = bookingId;
         await cancelBooking(bookingId);
-        await fetchBookings(); // Refresh the list
+        // Update booking status locally instead of refreshing
+        updateBookingStatus(bookingId, 'cancelled');
     } catch (err) {
         // Error is handled by the composable
     } finally {

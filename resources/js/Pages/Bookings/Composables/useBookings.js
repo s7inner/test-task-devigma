@@ -22,6 +22,17 @@ export function useBookings() {
         }
     };
 
+    const addBooking = (booking) => {
+        bookings.value.unshift(booking);
+    };
+
+    const updateBookingStatus = (bookingId, status) => {
+        const booking = bookings.value.find(b => b.id === bookingId);
+        if (booking) {
+            booking.status = status;
+        }
+    };
+
     onMounted(() => {
         fetchBookings();
     });
@@ -30,6 +41,8 @@ export function useBookings() {
         bookings,
         loading,
         error,
-        fetchBookings
+        fetchBookings,
+        addBooking,
+        updateBookingStatus
     };
 }
