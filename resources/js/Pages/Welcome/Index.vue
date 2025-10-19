@@ -2,7 +2,6 @@
 import { Head, Link } from '@inertiajs/vue3';
 import Footer from '@/Components/Navigation/Footer.vue';
 import Header from '@/Components/Navigation/Header.vue';
-import axios from 'axios';
 
 defineProps({
     canLogin: {
@@ -20,19 +19,6 @@ defineProps({
         required: true,
     },
 });
-
-// Test Axios functionality
-const testAxios = async () => {
-    try {
-        const response = await axios.get('/api/test');
-        console.log('Axios test successful:', response.data);
-    } catch (error) {
-        console.log('Axios test (expected to fail):', error.message);
-    }
-};
-
-// Call test function on component mount
-testAxios();
 </script>
 
 <template>

@@ -1,11 +1,48 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { useBookings } from './Composables/useBookings';
+import { useCreateBooking } from './Composables/useCreateBooking';
+import { useCancelBooking } from './Composables/useCancelBooking';
+import BookingsTable from './Components/BookingsTable.vue';
+import CreateBookingModal from './Components/CreateBookingModal.vue';
+
+const { bookings, loading, error, fetchBookings, addBooking, updateBookingStatus } = useBookings();
+const { loading: creating, error: createError, createBooking } = useCreateBooking();
+const { loading: cancelling, error: cancelError, cancelBooking } = useCancelBooking();
+
+const showCreateForm = ref(false);
+const cancellingBookingId = ref(null);
+
+const handleCreateBooking = async (formData) => {
+    try {
+        const newBooking = await createBooking(formData);
+        // Add new booking to local state instead of refreshing
+        addBooking(newBooking.data);
+        showCreateForm.value = false;
+    } catch (err) {
+        // Error is handled by the composable
+    }
+};
+
+const handleCancelBooking = async (bookingId) => {
+    try {
+        cancellingBookingId.value = bookingId;
+        await cancelBooking(bookingId);
+        // Update booking status locally instead of refreshing
+        updateBookingStatus(bookingId, 'cancelled');
+    } catch (err) {
+        // Error is handled by the composable
+    } finally {
+        cancellingBookingId.value = null;
+    }
+};
 </script>
 
 <template>
     <Head title="Bookings" />
-
+    
     <AppLayout>
         <!-- Hero Section -->
         <div class="text-center mb-8">
@@ -15,72 +52,47 @@ import { Head } from '@inertiajs/vue3';
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                Bookings
+                My Bookings
             </h1>
             <p class="text-lg text-gray-600 dark:text-gray-300">
-                Manage your appointments and reservations
+                View and manage your appointments
             </p>
         </div>
 
-        <!-- Booking Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Create Booking Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Create Booking</h3>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300 mb-4">
-                    Schedule a new appointment with date picker and time slot selection.
-                </p>
-                <div class="text-sm text-green-600 dark:text-green-400 font-medium">
-                    🚀 Coming Soon
-                </div>
-            </div>
-
-            <!-- View Bookings Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">View Bookings</h3>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300 mb-4">
-                    See all your current and upcoming appointments in a organized list.
-                </p>
-                <div class="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                    📋 Coming Soon
-                </div>
-            </div>
-
-            <!-- Cancel Bookings Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center mr-4">
-                        <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Cancel Bookings</h3>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300 mb-4">
-                    Cancel or reschedule your existing appointments when needed.
-                </p>
-                <div class="text-sm text-red-600 dark:text-red-400 font-medium">
-                    ❌ Coming Soon
-                </div>
-            </div>
+        <!-- Create Booking Button -->
+        <div class="mb-6 flex justify-end">
+            <button 
+                @click="showCreateForm = true"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Create New Booking
+            </button>
         </div>
 
+        <!-- Bookings Table -->
+        <BookingsTable 
+            :bookings="bookings"
+            :loading="loading"
+            :error="error"
+            :cancelling-booking-id="cancellingBookingId"
+            @retry="fetchBookings"
+            @cancel-booking="handleCancelBooking"
+        />
+
+        <!-- Create Booking Modal -->
+        <CreateBookingModal
+            :show="showCreateForm"
+            :loading="creating"
+            :error="createError"
+            @close="showCreateForm = false"
+            @submit="handleCreateBooking"
+        />
+
         <!-- Quick Actions -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
             <h3 class="text-xl font-bold mb-4 text-center">Quick Actions</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white/10 rounded-lg p-4">
