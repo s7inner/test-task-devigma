@@ -1,12 +1,24 @@
 # Test Task Devigma
 
-Simple Laravel project with Vue.js, configured to work with Docker using Laravel Sail.
+### Technologies Used
+
+- **Laravel 12** - PHP framework
+- **Vue 3** - Frontend framework  
+- **Tailwind CSS 4** - CSS framework
+- **Axios** - HTTP client
+- **Laravel Breeze** - Authentication scaffolding
+- **Laravel Sail** - Docker development environment
+- **Makefile** - Build automation
 
 ## Quick Start
 
-### 1. Run the project
+### 1. Add to hosts file
 
-Just execute one command:
+```
+127.0.0.1 test-task-devigma.test
+```
+
+### 2. Run the project
 
 ```bash
 make setup
@@ -19,7 +31,7 @@ This command will automatically:
 - Create test user
 - Build frontend
 
-### 2. Access the application
+### 3. Access the application
 
 **Application URL**: http://test-task-devigma.test
 
@@ -27,7 +39,7 @@ This command will automatically:
 - Email: `test@example.com`
 - Password: `password`
 
-### 3. Database connection
+### 4. Database connection
 
 Use `devigma` database for regular application and `devigma_test` for testing.
 
@@ -38,7 +50,7 @@ Use `devigma` database for regular application and `devigma_test` for testing.
 - Username: `sail`
 - Password: `password`
 
-### 4. Stop and remove containers
+### 5. Stop and remove containers
 
 To completely stop and remove all containers and volumes:
 
