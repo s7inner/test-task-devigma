@@ -23,7 +23,12 @@ setup:
 	@echo "Setting up testing database..."
 	@./vendor/bin/sail artisan migrate --env=testing --force
 	@echo "Installing Node.js dependencies..."
-	@./vendor/bin/sail npm install
+	@./vendor/bin/sail npm install --no-audit --no-fund
+	@echo "Cleaning build directory..."
+	@./vendor/bin/sail exec laravel.test rm -rf /var/www/html/public/build
+	@./vendor/bin/sail exec laravel.test mkdir -p /var/www/html/public/build
+	@./vendor/bin/sail exec laravel.test chown -R www-data:www-data /var/www/html/public/build
+	@./vendor/bin/sail exec laravel.test chmod -R 777 /var/www/html/public/build
 	@echo "Building frontend assets..."
 	@./vendor/bin/sail npm run build
 	@echo "Setup complete! Your application is ready."
